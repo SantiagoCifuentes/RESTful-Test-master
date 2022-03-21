@@ -108,6 +108,8 @@ class WidgetRestControllerTest {
     }
 
 
+    //PUT para modificar un elemento que se encuentra en la base de datos
+
     @Test
     @DisplayName("PUT/rest/widget/{id} success")
     void succesPutTestWidget() throws Exception {
@@ -135,6 +137,7 @@ class WidgetRestControllerTest {
     }
 
 
+    //PUT para modificar un elemento que no se encuentra en la base de datos (not found)
     @Test
     @DisplayName("PUT/rest/widget/{id} not found")
     void notFoundPutTest() throws Exception {
@@ -146,6 +149,32 @@ class WidgetRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(widgetToUpdate)))
                 .andExpect(status().isNotFound());
+
+
+    }
+
+
+    //GET para obtener un elemento por ID que se encuentra en la base de datos
+
+    @Test
+    @DisplayName("GET/rest/widget/{id} success")
+    void successGetByIdTest()throws Exception
+    {
+        Widget widgetToReturn = new Widget(1l, "Existing widget", "Description 1", 1);
+        doReturn(Optional.of(widgetToReturn)).when(service).findById(1l);
+
+        mockMvc.perform(get("/rest/widget/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+
+                // Validate headers
+                .andExpect(header().string(HttpHeaders.LOCATION, "/rest/widget/1"))
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.name", is("Existing widget")))
+                .andExpect(jsonPath("$.description", is("Description 1")))
+                .andExpect(jsonPath("$.version", is(1)));
+                
+                
 
 
     }
